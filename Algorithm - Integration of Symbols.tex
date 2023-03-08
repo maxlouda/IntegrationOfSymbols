@@ -1,0 +1,327 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath, amssymb, amstext}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{underscore}
+\usepackage{stix}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{blindtext}
+\usepackage{verbatim}
+\usepackage[left=1.5cm, right=1.8cm, top=2.4cm, bottom=1.8cm]{geometry}
+\usepackage{pdfpages}
+\usepackage{units}
+\usepackage{mathtools}
+\usepackage{xparse}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage[version=4]{mhchem}
+\usepackage[headsepline]{scrlayer-scrpage}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=black]{hyperref}
+\usepackage{bbm}
+\usepackage{tikz-cd}
+\pagestyle{scrheadings}
+%\cfoot{\pagemark}
+\newtheorem{satz}{Satz}
+\newtheorem{definition}{Definition}
+\newtheorem{bsp}{Beispiel}
+\newtheorem{bem}{Bemerkung}
+\newtheorem{prop}{Proposition}
+\newtheorem{lem}{Lemma}
+\newtheorem{cor}{Corollar}
+\newtheorem{notation}{Notation}
+\newcommand*{\QEDA}{\null\nobreak\hfill\ensuremath{\blacksquare}}
+\newcommand*{\ima}{\mathrm{Im}}
+\newcommand*{\Log}{\mathrm{Log}}
+\newcommand*{\Bild}{\mathrm{Bild}}
+\newcommand*{\Kern}{\mathrm{Kern}}
+\newcommand*{\spann}{\mathrm{span}}
+\newcommand*{\rang}{\mathrm{Rang}}
+\newcommand*{\Cov}{\mathrm{Cov}}
+\newcommand{\ssubset}{\subset\joinrel\subset}
+\newcommand*{\id}{\mathrm{id}}
+\newcommand*{\diff}{\mathrm{d}}
+\newcommand*{\ff}{\mathcal{F}}
+\newcommand*{\af}{\mathcal{A}}
+\newcommand*{\bff}{\mathcal{B}}
+\newcommand*{\pff}{\mathcal{P}}
+\newcommand*{\bfb}{\bar{\mathcal{B}}}
+\newcommand*{\Om}{\Omega}
+\newcommand*{\om}{\omega}
+\newcommand*{\IR}{\mathbb{R}}
+\newcommand*{\IQ}{\mathbb{Q}}
+\newcommand*{\IZ}{\mathbb{Z}}
+\newcommand*{\IC}{\mathbb{C}}
+\newcommand*{\IN}{\mathbb{N}}
+\newcommand*{\IK}{\mathbb{K}}
+\newcommand*{\XX}{\mathbf{X}}
+\newcommand*{\xx}{\mathbf{x}}
+\newcommand*{\YY}{\mathbf{Y}}
+\newcommand*{\yy}{\mathbf{y}}
+\newcommand*{\Yf}{\mathcal{Y}}
+\newcommand*{\Xf}{\mathcal{X}}
+\newcommand*{\Df}{\mathcal{D}}
+\newcommand*{\Nf}{\mathcal{N}}
+\newcommand*{\test}{\mathrm{test}}
+\newcommand*{\train}{\mathrm{train}}
+\newcommand*{\val}{\mathrm{valid}}
+\newcommand*{\osp}{\overline{\mathrm{span}}}
+\newcommand*{\dmu}{\, \mathrm{d} \mu}
+\newcommand*{\dnu}{\, \mathrm{d} \nu}
+\newcommand*{\dlamn}{\, \mathrm{d} \lambda^n}
+\newcommand*{\dlam}{\, \mathrm{d} \lambda}
+\newcommand*{\dx}{\, \mathrm{d} x}
+\newcommand*{\dy}{\, \mathrm{d} y}
+\newcommand*{\dt}{\, \mathrm{d} t}
+\newcommand*{\ds}{\, \mathrm{d} s}
+\newcommand*{\dz}{\, \mathrm{d} z}
+\newcommand*{\du}{\, \mathrm{d} u}
+\newcommand*{\dpst}{\, \mathrm{d} P}
+\newcommand*{\dbet}{\, \mathrm{d} \beta}
+\newcommand*{\dbetn}{\, \mathrm{d} \beta^n}
+\newcommand*{\dE}{\, \mathrm{d} E}
+\newcommand*{\vol}{\mathrm{vol}}
+\newcommand*{\divg}{\mathrm{div}\, }
+\newcommand*{\dist}{\mathrm{dist}}
+\newcommand*{\supp}{\mathrm{supp}}
+\newcommand*{\Var}{\mathrm{Var}}
+\newcommand*{\mse}{\mathrm{MSE}}
+\newcommand*{\ex}{\mathrm{ex}}
+\newcommand*{\conv}{\mathrm{conv}}
+\newcommand*{\argmin}{\mathrm{argmin}}
+\newcommand*{\sff}{\mathcal{S}}
+\newcommand*{\rff}{\mathcal{R}}
+\newcommand*{\Li}{\mathrm{Li}}
+\newcommand*{\fff}{\mathcal{F}}
+\newcommand*{\suc}{\mathrm{succ}}
+\newcommand*{\pre}{\mathrm{pred}}
+\newcommand\rct[1]{\begin{equation}\ce{#1}\end{equation}}
+\newcommand\rctno[1]{\begin{equation*}\ce{#1}\end{equation*}}
+
+
+\ExplSyntaxOn
+\clist_new:N \l_feq_vector_clist
+\NewDocumentCommand{\feqvector}{O{\\}mO{p}}{
+  \clist_set:Nn \l_feq_vector_clist {#2}
+  \begin{#3matrix}
+  \clist_use:Nn \l_feq_vector_clist {#1}
+  \end{#3matrix}
+}
+\ExplSyntaxOff
+
+\title{\textbf{Algorithm - Integration of Symbols}}
+\author{Maximilian Danner}
+\date{\today}
+
+
+\begin{document}
+
+
+\maketitle
+
+The subsequent discussion is essentially a summary of \url{https://arxiv.org/pdf/1110.0458.pdf}.
+
+\ \\
+
+\textbf{Input}: Some integrable tensor 
+\begin{equation}
+\label{eq:inp}
+S = \sum_{k = 1}^{w_{\mathrm{max}}} \sum_{i_1, ..., i_{k}} c^{(k)}_{i_1, ..., i_k} \left( R^{(k)}_{i_1} \otimes \cdots \otimes R^{(k)}_{i_k} \right)
+\end{equation}
+of mixed weight (weights run potentially from $1$ to $w_{\mathrm{max}}$). Furthermore $c_{i_1, ..., i_k} \in \IQ$, $R^{(k)}_{i_1}, ..., R^{(k)}_{i_k} \in \IQ[x_1, ..., x_n]$ for all $k \in \{1, ..., w_{\max}\}$ and all sums are finite. $\IQ(x_1, ..., x_n)$ denotes the field of all rational functions in the variables $x_1, ..., x_n$.
+
+\ \\
+
+\textbf{Output}: Some function $F$ which is a linear combination of MPLs and whose symbol coincides with $S$: $\sff(F) = S$.
+
+\ \\
+
+The following steps may be taken:
+\begin{itemize}
+\item[(i)] Split $S$ into terms of pure weight: $S = S^{(1)} + \cdots + S^{(k)}$, i.e. group together all terms in \ref{eq:inp} with the same number of factors in the tensor product. The following steps are to be applied on each $S^{(j)}, 1 \leq j \leq k$ separately. Therefore, we will omit the superscript $(k)$ in the future.
+\item[(ii)] Factorize each rational function $R_i$ into irreducible polynomials over $\IQ$: Let $R_i = f_i/g_i$ with all common divisors already cancelled out and $f, g \in \IQ[x_1, ..., x_n]$ where $\IQ[x_1, ..., x_n]$ denotes the ring of multivariate polynomials with coefficients in $\IQ$. Now factorize $f_i$ and $g_i$ into irreducible polynomials over $\IQ$ and denote their factors by
+\begin{equation*}
+\pi^{(f)}_1, ..., \pi^{(f)}_a, \pi^{(g)}_1, ..., \pi^{(g)}_b \in \IQ[x_1, ..., x_n].
+\end{equation*} 
+This is achievable through the Mathematica function Factor[]. Now plug those factorizations into \ref{eq:inp} and use the Tensor algebra (mainly distributivity) to be able to write $S$ as follows:
+\begin{equation*}
+S = \sum_{j_1, ..., j_w} \tilde{c}_{j_1, ..., j_w} \pi_{j_1} \otimes \cdots \otimes \pi_{j_w}.
+\end{equation*}
+This sum is finite as well. Denote the set of all such polynomials by $P_S := \{\pi_1, ..., \pi_K\}$ with $K \in \IN$. The symbol may now be viewed as an element $S \in \langle P_S \rangle_{\IQ}^{\otimes w}$.
+
+Example: HPLs. For harmonic PolyLogs the set $P_S$ can easily be seen to be equal to $\{x, 1+x, 1-x, 2\}$.
+
+\item[(iii)] Form $P'_S$ as the set of all irreducible polynomials appearing in $\pi_i \pm \pi_j$ and $1 \pm \pi_i$ and define $\overline{P_S} := P_S \cup P'_S$ whose elements are denoted by $\bar \pi _j, \ 1 \leq j \leq \bar K$.
+
+Example: HPLs. We get $\overline{P_S} = \{x, 1\pm x, 2, 1 \pm 2x, x \pm 3, x \pm 2\}$. The signs of the arguments are not important since we neglect torsion.
+
+\textbf{Question}: How do we handle constant polynomials? If the polynomial is equal to one or zero, the tensor product vanishes. But for all other rational numbers the tensor product should not vanish and is unrelated to each other. For example $2 \otimes (1+x)$ is linearly independent to $3 \otimes (1+x) = (2 \cdot 3/2) \otimes (1+x) = 2 \otimes (1+x) + (3/2) \otimes (1+x)$. Why is only $2 \in \overline{P_S}$ but not $3 \in \overline{P_S}$? Exception: Powers of constant polynomials already considered need not be included, of course.
+
+\item[(iv)] Choosing types of functions to appear in $F$: We are only interested in polylogarithms $\Li_{m_1, ..., m_k}(x_1, ..., x_k)$ that are simplest in the following sense: a product of lower weight function types is simpler than function types of pure weight.
+
+Example: For weight seven, the following indecomposable multiple polylogarithms arise:
+\begin{equation*}
+\Li_7(x), \ \Li_{2,5}(x,y), \ \Li_{3,4}(x,y), \ \Li_{2,2,3}(x,y,z).
+\end{equation*}
+Short overview over the steps to arrive at this conclusion:
+\begin{itemize}
+\item According to a conjecture, MPLs where at least one index equals 1 are decomposable as a sum of products of MPLs where no index equals 1. So, e.g. $\Li_{1,6}(x,y)$ or $\Li_{1,2,4}(x,y,z)$ do not appear. Also, the depth is therefore bounded from above by 3.
+\item Because of the stuffle relation
+\begin{equation*}
+\Li_{m_1}(x) \Li_{m_2}(x) = \Li_{m_1, m_2}(x,y) + \Li_{m_2, m_1}(x,y) + \Li_{m_1 + m_2}(xy)
+\end{equation*}
+the function type $\Li_{5,2}$ can be related to the function types $\Li_{2,5}$ and $\Li_{7}$ (which are already in the list above) and is hence redundant.
+\item The shuffle and stuffle relations applied on $\Li_2(x) \Li_2(y) \Li_3(z)$ yield two (according to the paper independent) expressions in which (among others) the function types $\Li_{2,2,3}, \Li_{2,3,2}$ and $\Li_{3,2,2}$ are related:
+\begin{equation*}
+\begin{split}
+\Li_{2}(x) \Li_2(y) \Li_3(z) & = \Li_{7}(xyz) + \Li_{2,5}(x,yz) + \Li_{2,5}(y,xz) + \Li_{3,4}(z,xy) + \Li_{4,3}(xy,z) + \Li_{5,2}(xz,y) + \Li_{5,2}(yz,x) + \\ & + \Li_{2,2,3}(x,y,z) + \Li_{2,2,3}(y,x,z) + \Li_{2,3,2}(x,z,y) + \Li_{2,3,2}(y,z,x) + \Li_{3,2,2}(z,x,y) + \Li_{3,2,2}(z,y,x),
+\end{split}
+\end{equation*}
+\begin{equation*}
+\begin{split}
+\Li_2(x) \Li_2(y) \Li_3(z) & = -12 \Li_{1,1,5}(x/y, y/z, z) - 12 \Li_{1,1,5}(y/x, x/z, z) - 12 \Li_{1,1,5}(x/z, z/y, y) - 12 \Li_{1,1,5}(y/z, z/x, x) - \cdots - \\ & - \Li_{2,2,3}(x/y, y/z, z) - \Li_{2,2,3}(y/x, x/z, z) - 2 \Li_{2,2,3}(x/z, z/y, y) - 2 \Li_{2,2,3}(y/z, z/x, x) - \cdots - \\ & -2 \Li_{2,3,2}(z/x, x/y, y) - 2 \Li_{2,3,2}(z/y, y/x, x)-\Li_{3,2,2}(z/x, x/y, y) - \Li_{3,2,2}(z/y, y/x, x).
+\end{split}
+\end{equation*}
+Hence, we can restrict ourselves to the function type $\Li_{2,2,3}$.
+\end{itemize}
+
+\item[(v)] Choosing arguments of the above function types. This may be done in the following steps.
+\begin{itemize}
+\item[(v.i)] Defining a pool of possible arguments:
+\begin{equation*}
+\rff_S := \bigcup_{N \in \IN_0} \mathcal{R}_S^{(N)} \ \ \ \mathrm{with} \ \ \ \mathcal{R}_S^{(N)} := \{ \bar \pi_1^{n_1} \cdots \bar \pi_{\bar K}^{n_{\bar K}} \ | \ n_1, ..., n_{\bar K} \in \IZ \ \mathrm{and} \ |n_1| + \cdots + |n_{\bar K}| = N \}.
+\end{equation*}
+Usually, $N$ does not have to be arbitrarily big for the rest of the algorithm to work, so we will in practice work up to a (user defined) upper bound $N_{\max}$. Note: this destroys the group properties $(\rff_S, \cdot)$ has: in particular, the product of two elements of $\rff_S$ is not necessarily an element of $\rff_S$. However, the existence of an Inverse and of Unity remain untouched.
+\item[(v.ii)] Restricting to suitable arguments, part 1. We introduce the set
+\begin{equation*}
+\rff_{S}^{(1)} := \{R \in \rff_S \ | \ 1 - R \in \rff_S\}
+\end{equation*}
+as well as the operations on this set
+\begin{equation*}
+\sigma_1(R) := R, \ \sigma_2(R) := 1 - R, \ \sigma_3(R) := \frac{1}{R}, \ \sigma_4(R) := \frac{1}{1-R}, \ \sigma_5(R) := 1 - \frac{1}{R}, \ \sigma_6(R) := \frac{R}{R-1}
+\end{equation*}
+and notice that firstly $(\{\sigma_1, ..., \sigma_6\}, \circ) \cong S_3$ and secondly $\rff_S^{(1)}$ is closed under this group action. How do we quickly determine if it is possible that a given rational function from $\rff_S$ belongs to $\rff_{S}^{(1)}$? Take an arbitrary element $R \in \rff_S$ and write for $s \in \{-1, +1\}, \ n_i \in \IN$:
+\begin{equation*}
+R = s \frac{\bar \pi_1^{n_1} \cdots \bar \pi_l^{n_l}}{\bar \pi_{l+1}^{n_{l+1}} \cdots \bar \pi_{k}^{n_k}} \implies 1 - R = \frac{\bar \pi_{l+1}^{n_{l+1}} \cdot \bar \pi_{k}^{n_k} - s \bar \pi_1^{n_1} \cdots \bar \pi_l^{n_l}}{\bar \pi_{l+1}^{n_{l+1}} \cdots \bar \pi_k^{n_k}} =: \frac{\Pi}{\bar \pi_{l+1}^{n_{l+1}} \cdots \bar \pi_k^{n_k}}
+\end{equation*}
+Now construct prime numbers $\{p_1, ..., p_n\}$ such that $\bar \pi_i(p_1, ..., p_n) \neq \bar \pi_j (p_1, ..., p_n)$ whenever $i \neq j$ (This may be done in advance). A necessary condition for $R \in \rff_S^{(1)}$ is then given by $\bar \pi_i(p_1, ..., p_n) | \Pi(p_1, ..., p_n)$ for at least one $i \in \{1, ..., \bar K\}$.
+
+All elements of $\rff_S^{(1)}$ are valid candidates for arguments of depth one polylogarithms.
+
+\textbf{Question}: Clearly, this group action can be used to traverse $\rff_S^{(1)}$ in a more efficient manner. But how exactly? I'd propose the following procedure.
+\begin{itemize}
+\item Take $N \in \IN$ (has to be iterated over up until some user defined cut off) and generate up to permutation (takes very long to compute!) all $\bar K$-tuples $(n_1, ..., n_{\bar K})$ whose absolute values sum to $N$.
+\item Calculate for each permutation $\rho \in S_{\bar K}$ of the list $(\bar \pi_1, ..., \bar \pi_{\bar K})$ and for each $\bar K$-tuple as above the rational function $R = \bar \pi_{\rho(1)}^{n_1} \cdots \bar \pi_{\rho(\bar K)}^{n_{\bar K}}$.
+\item Check, if $R$ is already in the list of results. May be done with MemberQ[]. If not, continue. If yes, break.
+\item Check for each such computed quantity the necessary condition. I.e. select those $\bar \pi_i$'s with a negative exponent. Then evaluate
+\begin{equation*}
+\Pi(p_1, ..., p_n) = \left[ (1 - R) \prod_{\mathrm{neg. \ exponents}} \bar \pi_i \right](p_1, ..., p_n).
+\end{equation*}
+Now check, whether there is at least one $\bar \pi_i$ such that $\bar \pi_i(p_1, ..., p_n)|\Pi(p_1, ..., p_n)$.
+\item If yes, add $R$ and its orbit to the list of results. Note: since $R$ has not been in the list of results so far, neither has been its orbit. This is because the orbits of a group action partition the underlying set into disjoint subsets. (Applying $S_3$ may lead outside $\rff_S^{(N)}$ - could this pose a problem?!) If no, discard $R$. In both cases, proceed with the next permutation of the $\bar \pi$-list or the next $(n_1, ..., n_{\bar K})$ list.
+\item The result of this algorithm is ideally $\rff_S^{(1)}$.
+\end{itemize}
+Problem: looks quite procedural. How to optimize performance using functional programming/built-in functions?
+
+\item[(v.iii)] Restricting to suitable arguments, part 2. Now focus on finding possible arguments for higher depth. We build on the results of step (v.ii) and define the set of possible arguments for MPL's of depth $k$ by
+\begin{equation*}
+\rff_S^{(k)} := \{ (R_1, ..., R_k) \in \rff_S^{(1)} \times \cdots \times \rff_S^{(1)} \ | \ R_i - R_j \in \rff_S \ \mathrm{for \ all \ } 1 \leq i < j \leq k \}.
+\end{equation*}
+On this set the action of a product group isomorphic to $S_3 \times S_k$ under which $\rff_S^{(k)}$ is closed can be introduced as well (the $S_3$ component is the same as in (v.ii)):
+\begin{equation*}
+S_3 \times S_k : \rff_S^{(k)} \to \rff_S^{(k)}, \ \ \ (\sigma, \rho) : (R_1, ..., R_k) \mapsto (\sigma(R_{\rho(1)}), ..., \sigma(R_{\rho(k)})).
+\end{equation*}
+How do we determine quickly, whether or not $R_i - R_j \in \rff_S$? Analogous to before, this can be done as follows: Write
+\begin{equation*}
+R_i = s_i \frac{\bar \pi_1^{n_1} \cdots \bar \pi_l^{n_l}}{\bar \pi_{l+1}^{n_{l+1}} \cdots \bar \pi_{k}^{n_k}}, \ \ \ R_j = s_j \frac{\bar \pi_1^{m_1} \cdots \bar \pi_p^{m_p}}{\bar \pi_{p+1}^{m_{p+1}} \cdots \bar \pi_{q}^{m_q}} \implies R_i - R_j = \frac{\Pi}{(\bar \pi_{l+1}^{n_{l+1}} \cdots \bar \pi_{k}^{n_k})(\bar \pi_{p+1}^{m_{p+1}} \cdots \bar \pi_{q}^{m_q})},
+\end{equation*}
+where all exponents are positive integers and $s_{i,j} \in \{-1, +1\}$. $\Pi$ has to fulfill the exact same condition as in (v.ii) so that $R_i - R_j$ is likely to be an element of $\rff_S$. The algorithmic procedure may look as follows:
+\begin{itemize}
+\item Consider (up to permutations - those are added later via the group action) all lists of length $k$ that can be formed out of the elements of $\rff_S^{(1)}$. This can be achieved by using the Tuples[] function.
+\item For each instance of such a k-list, consider all subsets of cardinality 2 and determine, if the above condition is fulfilled.
+\item If the condition is fulfilled for all 2-subsets, then the analyzed $k$-tuple is a valid candidate for being an argument and it can be added to the list of results.
+\item Now apply the group action to each element of the list of results.
+\end{itemize}
+\end{itemize}
+\item[(vi)] The above steps have lead to the enumeration of all possible function types for a given weight as well as arguments for a given depth. Now, appropriately group together those two results to form a finite set of functions $\Phi$ and partition $\Phi$ with respect to weight $w$ into subsets $\Phi^{(w)} = \{b_i^{(w)}\}_i$. We now make the ansatz:
+\begin{equation*}
+S = \sum_i c_i \sff(b_i^{(w)}) + \sum_{i_1, i_2, w_1 + w_2 = w} c_{i_1, i_2} \sff (b_{i_1}^{w_1} b_{i_2}^{w_2}) + \cdots + \sum_{i_1, ..., i_w} c_{i_1, ..., i_w} \sff (b_{i_1}^{(1)} \cdots b_{i_w}^{(1)}).
+\end{equation*}
+The rational coefficients appearing above are to be calculated.
+
+\item[(vii)] Determining the coefficients from (vi). We make use of an inductive approach.
+\begin{itemize}
+\item[(vii.i)] Preparations. Let $V$ be an arbitrary vector space. Define projectors recursively by
+\begin{equation*}
+\Pi_1 := \id, \ \ \ \Pi_w(a_1 \otimes \cdots \otimes a_w) := \frac{w-1}{w} \big( \Pi_{w-1}(a_1 \otimes \cdots \otimes a_{w-1}) \otimes a_w - \Pi_{w-1}(a_2 \otimes \cdots \otimes a_w) \otimes a_1 \big)
+\end{equation*}
+and extend by linearity. These linear maps are idempotent $\Pi^2_w = \Pi_w$ and have the property that $\Pi_w(\xi) = 0$ iff $\xi$ can be written as a linear combination of shuffle products.
+
+Now, let $\lambda$ denote an integer partition of the weight $w$, and introduce (pseudo-)lexicographic ordering $\prec$ (it coincides with standard lexicographic ordering up until weight five) on the set of all non-increasing integer partitions of a given weight $w$. Define the following concepts:
+\begin{itemize}
+\item $\lambda$-shuffle. Let $\lambda = (\lambda_1, ..., \lambda_r)$. The $\lambda$-shuffle is then defined by
+\begin{equation*}
+\shuffle_{\lambda} (a_1 \otimes \cdots \otimes a_w) := (a_1 \otimes \cdots \otimes a_{\lambda_1}) \shuffle (a_{\lambda_1 + 1} \otimes \cdots \otimes a_{\lambda_1 + \lambda_2}) \shuffle \cdots \shuffle (a_{\lambda_1 + \cdots + \lambda_{r-1}+1} \otimes \cdots \otimes a_w).
+\end{equation*}
+\item $\lambda$-projector. For $\lambda' = (\lambda'_1, ..., \lambda'_s)$ the $\lambda'$-projector is defined by
+\begin{equation*}
+\Pi_{\lambda'} := \Pi_{\lambda'_1} \otimes \Pi_{\lambda'_2} \otimes \cdots \otimes \Pi_{\lambda'_s}.
+\end{equation*}
+In particular, it follows for $\lambda' = (w)$ that $\Pi_{\lambda'} \equiv \Pi_w$.
+\end{itemize}
+
+Example: For weight $6$ we have in the pseudo-lexicographic ordering:
+\begin{equation*}
+(6) \succ (5,1) \succ (4,2) \succ (3,3) \succ (4,1,1)  \succ (3, 2, 1) \succ (2,2,2) \succ (3,1,1,1) \succ (2,2,1,1) \succ (2,1,1,1,1) \succ (1,1,1,1,1,1).
+\end{equation*}
+Note, that we would obtain
+\begin{equation*}
+(6) \succ (5,1) \succ (4,2)  \succ (4,1,1) \succ (3,3) \succ (3, 2, 1) \succ (3,1,1,1) \succ (2,2,2) \succ (2,2,1,1) \succ (2,1,1,1,1) \succ (1,1,1,1,1,1)
+\end{equation*}
+in the standard lexicographic ordering and the not monotonically decreasing sequence of lengths would destroy the subsequent argument.
+
+\textbf{Question}: is the exact definition of the ordering important as long as the sequence of lengths is monotonically decreasing? In my opinion this should be the case since we still define a filtration and the result below still applies.
+
+The $(3,2,1)$-shuffle is given by
+\begin{equation*}
+(a_1 \otimes a_2 \otimes a_3) \shuffle (a_4 \otimes a_5) \shuffle (a_6).
+\end{equation*}
+
+An important result is the following: Let $\lambda, \lambda'$ be non-increasing integer partitions of $w$ with lengths $\ell(\lambda), \ell(\lambda')$. It holds:
+\begin{equation*}
+\ell(\lambda') \leq \ell(\lambda) \implies \Pi_{\lambda'} (\shuffle_{\lambda}(a_1 \otimes \cdots \otimes a_w)) = 0.
+\end{equation*}
+
+Define subspaces of $V^{\otimes w}$ by:
+\begin{equation*}
+\fff_{\lambda} := \langle \{ \mu-\mathrm{shuffles \ in \ } V \ | \ \lambda \succeq \mu \}\rangle_{\IQ}.
+\end{equation*}
+Clearly these subspaces form a filtration, e.g. for $w = 6$:
+\begin{equation*}
+V^{\otimes w} = \fff_{(6)} \supseteq \fff_{(5,1)} \supseteq \fff_{(4,2)} \supseteq \cdots \supseteq \fff_{(1, 1, 1, 1, 1, 1)}.
+\end{equation*}
+Furthermore, $\fff_{\lambda} \subseteq \Kern(\Pi_{\suc(\lambda)})$ where $\suc(\lambda)$ denotes the successor of $\lambda$ w.r.t. lexicographic ordering, e.g. $\suc((4,2)) = (5,1)$. Note that $\ell(\suc(\lambda)) \leq \ell(\lambda)$.
+
+\item[(vii.ii)] Begin of induction: $\lambda' = (w)$. We use the second property of $\Pi_w$ mentioned above to determine the coefficients $c_i$ as it allows us to conclude:
+\begin{equation*}
+\Pi_w(S) = \sum_i c_i \Pi_w(\sff(b_i^{(w)})).
+\end{equation*}
+By evaluating the symbol map $\sff$ as well as the projector $\Pi_w$ and comparing the coefficients in front of the elementary tensors we can immediately deduce the coefficients $c_i$. This yields the first approximation $S_{\lambda = (w)} = \sum_{i} c_i \sff (b_i^{(w)})$.
+
+\item[(vii.iii)] Induction step. Assume, we have found an approximation $S_{\lambda}$, such that $\Pi_{\lambda}(S - S_{\lambda}) = 0$. Our goal is now to find $S_{\pre(\lambda)} = S_{\lambda} + T_{\pre(\lambda)}$ such that $\Pi_{\pre(\lambda)}(S - S_{\pre(\lambda)}) = 0$. This leads to the following equation:
+\begin{equation*}
+\Pi_{\pre(\lambda)}(T_{\pre(\lambda)}) = \Pi_{\pre(\lambda)}(S - S_{\lambda}) = \sum_{i_1, ..., i_l} c_{i_1, ..., i_l} \Pi_{\pre(\lambda)} \big( \sff (b_{i_1}^{(\pre(\lambda)_1)} \cdots b_{i_l}^{(\pre(\lambda)_l)}) \big)
+\end{equation*}
+By solving the resulting linear system, we get the coefficients and hence $S_{\pre(\lambda)}$. Ideally, we get a tensor $S_{(1, ..., 1)}$ such that $S - S_{(1, ..., 1)} = 0$.
+\end{itemize}
+
+\item[(viii)] Determining constants. Use known generators of the kernel of the symbol map $\sff$, make an ansatz for the constants and fix the coefficients of the ansatz by looking at known special values for the arguments (e.g. $x_i \in \{0, 1\}$).
+
+\end{itemize}
+
+
+
+
+
+\end{document}
