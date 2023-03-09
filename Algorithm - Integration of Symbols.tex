@@ -156,7 +156,7 @@ Example: HPLs. For harmonic PolyLogs the set $P_S$ can easily be seen to be equa
 
 Example: HPLs. We get $\overline{P_S} = \{x, 1\pm x, 2, 1 \pm 2x, x \pm 3, x \pm 2\}$. The signs of the arguments are not important since we neglect torsion.
 
-\textbf{Question}: How do we handle constant polynomials? If the polynomial is equal to one or zero, the tensor product vanishes. But for all other rational numbers the tensor product should not vanish and is unrelated to each other. For example $2 \otimes (1+x)$ is linearly independent to $3 \otimes (1+x) = (2 \cdot 3/2) \otimes (1+x) = 2 \otimes (1+x) + (3/2) \otimes (1+x)$. Why is only $2 \in \overline{P_S}$ but not $3 \in \overline{P_S}$? Exception: Powers of constant polynomials already considered need not be included, of course.
+\textbf{Question}: How do we handle constant polynomials? If the polynomial is equal to one or zero, the tensor product vanishes. But for all other rational numbers the tensor product should not vanish. For example $2 \otimes (1+x)$ is linearly independent to $3 \otimes (1+x) = (2 \cdot 3/2) \otimes (1+x) = 2 \otimes (1+x) + (3/2) \otimes (1+x)$. Why is only $2 \in \overline{P_S}$ but not $3 \in \overline{P_S}$? Exception: Powers of constant polynomials already considered need not be included, of course.
 
 \item[(iv)] Choosing types of functions to appear in $F$: We are only interested in polylogarithms $\Li_{m_1, ..., m_k}(x_1, ..., x_k)$ that are simplest in the following sense: a product of lower weight function types is simpler than function types of pure weight.
 
@@ -192,7 +192,7 @@ Hence, we can restrict ourselves to the function type $\Li_{2,2,3}$.
 \begin{equation*}
 \rff_S := \bigcup_{N \in \IN_0} \mathcal{R}_S^{(N)} \ \ \ \mathrm{with} \ \ \ \mathcal{R}_S^{(N)} := \{ \bar \pi_1^{n_1} \cdots \bar \pi_{\bar K}^{n_{\bar K}} \ | \ n_1, ..., n_{\bar K} \in \IZ \ \mathrm{and} \ |n_1| + \cdots + |n_{\bar K}| = N \}.
 \end{equation*}
-Usually, $N$ does not have to be arbitrarily big for the rest of the algorithm to work, so we will in practice work up to a (user defined) upper bound $N_{\max}$. Note: this destroys the group properties $(\rff_S, \cdot)$ has: in particular, the product of two elements of $\rff_S$ is not necessarily an element of $\rff_S$. However, the existence of an Inverse and of Unity remain untouched.
+Usually, $N$ does not have to be arbitrarily big for the rest of the algorithm to work, so we will in practice work up to a (user defined) upper bound $N_{\max}$. Note: this destroys the group properties $(\rff_S, \cdot)$ has: in particular, the product of two elements of $\rff_S$ is not necessarily an element of $\rff_S$. However, the existence of an Inverse and of Unity remains untouched.
 \item[(v.ii)] Restricting to suitable arguments, part 1. We introduce the set
 \begin{equation*}
 \rff_{S}^{(1)} := \{R \in \rff_S \ | \ 1 - R \in \rff_S\}
@@ -209,7 +209,7 @@ Now construct prime numbers $\{p_1, ..., p_n\}$ such that $\bar \pi_i(p_1, ..., 
 
 All elements of $\rff_S^{(1)}$ are valid candidates for arguments of depth one polylogarithms.
 
-\textbf{Question}: Clearly, this group action can be used to traverse $\rff_S^{(1)}$ in a more efficient manner. But how exactly? I'd propose the following procedure.
+Clearly, this group action can be used to traverse $\rff_S^{(1)}$ in a more efficient manner. But how exactly? I'd propose the following procedure.
 \begin{itemize}
 \item Take $N \in \IN$ (has to be iterated over up until some user defined cut off) and generate up to permutation (takes very long to compute!) all $\bar K$-tuples $(n_1, ..., n_{\bar K})$ whose absolute values sum to $N$.
 \item Calculate for each permutation $\rho \in S_{\bar K}$ of the list $(\bar \pi_1, ..., \bar \pi_{\bar K})$ and for each $\bar K$-tuple as above the rational function $R = \bar \pi_{\rho(1)}^{n_1} \cdots \bar \pi_{\rho(\bar K)}^{n_{\bar K}}$.
@@ -282,11 +282,6 @@ Note, that we would obtain
 in the standard lexicographic ordering and the not monotonically decreasing sequence of lengths would destroy the subsequent argument.
 
 \textbf{Question}: is the exact definition of the ordering important as long as the sequence of lengths is monotonically decreasing? In my opinion this should be the case since we still define a filtration and the result below still applies.
-
-The $(3,2,1)$-shuffle is given by
-\begin{equation*}
-(a_1 \otimes a_2 \otimes a_3) \shuffle (a_4 \otimes a_5) \shuffle (a_6).
-\end{equation*}
 
 An important result is the following: Let $\lambda, \lambda'$ be non-increasing integer partitions of $w$ with lengths $\ell(\lambda), \ell(\lambda')$. It holds:
 \begin{equation*}
