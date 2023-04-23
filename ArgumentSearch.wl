@@ -50,8 +50,7 @@ PIsEvalAtPrimes1 = Flatten[Map[#[primes1]&, Map[Function[Evaluate[vars], Evaluat
 PIsEvalAtPrimes2 = Flatten[Map[#[primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
 PIsEvalAtPrimes3 = Flatten[Map[#[primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
 While[nn<=n,
-Print[nn];
-(*ntuples = SumAbsValues[nn,Length[PIlist]]*);
+(*ntuples = SumAbsValues[nn,Length[PIlist]]*)
 ntuples = DeleteDuplicates[Reverse /@ Sort /@ SumAbsValues[nn, Length[PIlist]]];
 Do[ntuplesRed = DeleteCases[ntuples[[i]],0];
 temp = DeleteDuplicates[Times@@@((Power @@ {#, ntuplesRed})& /@ Flatten[Permutations/@Subsets[PIlist, {Length[ntuplesRed]}],1])];

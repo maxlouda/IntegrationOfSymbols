@@ -238,11 +238,19 @@ Return[res]]
 
 
 ProjLambda[expr_, lambda_]:=Module[{res},
+If[expr ===0, res = 0, If[AllTrue[lambda, #==1&],res = expr,
 res = SymbolicExpressionToList[expr];
-res = Transpose[Map[Function[list, Map[{list[[1]],#}&, TakeList[list[[2]], lambda]]], res]];
+(*res = Transpose[Map[Function[list, Map[{list[[1]],#}&, TakeList[list[[2]], lambda]]], res]];
 res = ListToSymbolicExpression /@ res;
 res = Proj /@ res;
-res = SymbConcatenation@@res /. {SymbPlus[a___, SymbPlus[b__],c___]:>SymbPlus[a,b,c]};
+res = SymbConcatenation@@res /. {SymbPlus[a___, SymbPlus[b__],c___]:>SymbPlus[a,b,c]};];*)
+res = Map[Function[{pair},Map[{pair[[1]],#}&,TakeList[pair[[2]],lambda]]],res];
+res = MapAt[ReplacePart[#,1->1]&,res,{All,2;;}];
+res = res /. {{Except[_List, x1_], {arg__}}:>SymbScalar[x1, Symb[arg]]};
+res = Map[Proj, res, {2}];
+res = Replace[res, s_Symb/; Not[MatchQ[Unevaluated[s],_SymbScalar]]:>SymbScalar[1,s],{0,Infinity}];
+res = Map[SymbConcatenation @@ # &, res];
+res = ReadableToSymbolicExpression[SymbolicExpressionToReadable[SymbPlus@@res]];];];
 Return[res]]
 
 
