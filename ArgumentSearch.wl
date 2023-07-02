@@ -3,21 +3,188 @@
 (*If necessary, add the address to the file where the packages are saved to the $Path variable.*)
 
 
-BeginPackage["ArgumentSearch`", {"Factorizations`", "GenerateEqualSumArrays`"}];
+(*BeginPackage["ArgumentSearch`", {"Factorizations`", "GenerateEqualSumArrays`"}];*)
 
 
-GenerateRS1::usage = "In: user defined cut-off integer n, list of multiplicatively independent polynomials. Out: candidates for depth one arguments in list RS1.";
+(*GenerateRS1::usage = "In: user defined cut-off integer n, list of multiplicatively independent polynomials. Out: candidates for depth one arguments in list RS1.";
 IfDivisibleThenDivide::usage = "In: integer num, listPIsEvalAtPrimes. Out: -1, 1, or zero";
 FindGoodIndices::usage = "In: list tobechecked, list PIsEvalAtPrimes. Out: all good indices of tobechecked.";
 DetermineIfGoodTuples::usage = "In: list of tuples, PIsEvalAtPrimes, primes, vars. Out: boolean.";
 GenerateRSn::usage = "In: list rs1, integer k. Out: all admissible k-tuples of arguments.";
+*)
 
 
-Begin["`Private`"];
+(*Begin["`Private`"];*)
 
 
-Unprotect["`*"];
-Clear["`*"];
+(*Unprotect["`*"];
+Clear["`*"];*)
+
+
+AllSigns[len_] := AllSigns[len]=
+    Block[{res},
+        res = Table[PadLeft[ConstantArray[1, i], len - 1, 0], {i, 0, 
+            len - 1}];
+        res = Flatten[Permutations /@ res, 1];
+        res = Map[(-1) ^ #&, res, {2}];
+        res = Prepend[#, 1]& /@ res;
+        If[len == 1,
+            Return[{1}]
+            ,
+            Return[res]
+        ];
+    ];
+
+
+AddSignsSymb[list_] := AddSignsSymb[list] = 
+    Block[{res, a, b},
+        res = Reap[
+                Do[
+                    a = Table[list[[i]], 2 ^ (Length[list[[i]]]-1)];
+                    b = AllSigns[Length[list[[i]]]];
+                    Sow[a * b]
+                    ,
+                    {i, 0, Length[list]}
+                ]
+            ][[2]];
+        Return[Flatten[res,2]]
+    ]
+
+
+SumAbsValues[N_, len_] :=
+    Block[{res},
+        res = Select[IntegerPartitions[N], Length[#] <= len&];
+        res = AddSignsSymb[res];
+        res = Map[Join[#, ConstantArray[0, len - Length[#]]]&, res, {
+            1}];
+        (*res = Flatten[Permutations /@ res, 1];*);
+        Return[DeleteDuplicates[res]]
+    ];
+
+
+GetPIsFromRs[Rlist_] :=
+    Block[{res},
+        res = Sort[DeleteCases[DeleteDuplicates[First /@ Flatten[Map[
+            FactorList[#]&, Flatten[NumeratorDenominator[Factor[FullSimplify[Rlist
+            ]]]], 1], 1]], 1, 1]];
+        Return[HandleDegZero[res]]
+    ]
+
+
+GetPIBarsFromPIs[PIlist_] :=
+    Block[{res},
+        res = DeleteDuplicates[First /@ Flatten[Map[FactorList[#]&, Union[
+            Map[Plus[#[[1]], #[[2]]]&, Tuples[Prepend[PIlist, 1], 2], 1], Map[Plus[
+            #[[1]], -#[[2]]]&, Tuples[Prepend[PIlist, 1], 2], 1]], 1], 1]];
+        Return[DeleteElements[HandleDegZero[res],{0}]]
+    ]
+
+
+HandleDegZero[polylist_] :=
+    Block[{res, vars, intgs},
+        vars = Union @@ (Variables[Apply[List, #]]& /@ polylist);
+        intgs = Select[polylist, Exponent[#, vars] == ConstantArray[0,
+             Length[vars]]&];
+        res = DeleteElements[polylist, intgs];
+        intgs = DeleteElements[DeleteDuplicates[First /@ Flatten[Map[
+            FactorInteger[#]&, intgs], 1]], {-1, 1}];
+        res = Join[res, intgs];
+        Return[res]
+    ]
+
+
+FindPrimes1[PIlist_] :=
+    Block[{res, vars, primes, functions, found, n, pos},
+        vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
+        functions =
+            Map[
+                Function[Evaluate[vars],
+                    Evaluate[#]
+                ]&
+                ,
+                PIlist
+            ];
+        found = False;
+        n = 5;
+        pos = 1;
+        While[
+            found == False
+            ,
+            primes = Tuples[Prime /@ Range[50, 50 + n], Length[vars]];
+            res = Outer[#2 @@ #1&, primes, functions, 1];
+            found = SelectFirst[res, Length[DeleteDuplicates[Abs/@#]] == Length[
+                functions]&,False];
+            pos = FirstPosition[res, found];
+            n++;
+        ];
+        Return[Flatten[primes[[pos]]]]
+    ]
+
+
+FindPrimes2[PIlist_] :=
+    Block[{res, vars, primes, functions, found, n, pos},
+        vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
+        functions =
+            Map[
+                Function[Evaluate[vars],
+                    Evaluate[#]
+                ]&
+                ,
+                PIlist
+            ];
+        found = False;
+        n = 5;
+        pos = 1;
+        While[
+            found == False
+            ,
+            primes = Tuples[Prime /@ Range[100, 100 + n], Length[vars]];
+            res = Outer[#2 @@ #1&, primes, functions, 1];
+            found = SelectFirst[res, Length[DeleteDuplicates[Abs/@#]] == Length[
+                functions]&,False];
+            pos = FirstPosition[res, found];
+            n++;
+        ];
+        Return[Flatten[primes[[pos]]]]
+    ]
+
+
+FindPrimes3[PIlist_] :=
+    Block[{res, vars, primes, functions, found, n, pos},
+        vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
+        functions =
+            Map[
+                Function[Evaluate[vars],
+                    Evaluate[#]
+                ]&
+                ,
+                PIlist
+            ];
+        found = False;
+        n = 5;
+        pos = 1;
+        While[
+            found == False
+            ,
+            primes = Tuples[Prime /@ Range[150, 150 + n], Length[vars]];
+            res = Outer[#2 @@ #1&, primes, functions, 1];
+            found = SelectFirst[res, Length[DeleteDuplicates[Abs/@#]] == Length[
+                functions]&,False];
+            pos = FirstPosition[res, found];
+            n++;
+        ];
+        Return[Flatten[primes[[pos]]]]
+    ]
+
+
+S3IdOrbit[R_]:= Block[{res},
+res = {R, 1-R, 1/R, 1/(1-R), 1 - 1/R, R/(R-1)};
+Return[FullSimplify[res]]]
+
+
+S3SkOrbit[Rs_]:= Block[{res},
+res = Flatten[S3IdOrbit/@(Permutations[Rs]),1];
+Return[res]]
 
 
 IfDivisibleThenDivide[num_, PIsEvalAtPrimes_] := 
@@ -46,9 +213,9 @@ primes1 = FindPrimes1[PIlist];
 primes2 = FindPrimes2[PIlist];
 primes3 = FindPrimes3[PIlist];
 vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
-PIsEvalAtPrimes1 = Flatten[Map[#[primes1]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
-PIsEvalAtPrimes2 = Flatten[Map[#[primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
-PIsEvalAtPrimes3 = Flatten[Map[#[primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
+PIsEvalAtPrimes1 = Map[#[Sequence@@primes1]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes2 = Map[#[Sequence@@primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes3 = Map[#[Sequence@@primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
 While[nn<=n,
 (*ntuples = SumAbsValues[nn,Length[PIlist]]*)
 ntuples = DeleteDuplicates[Reverse /@ Sort /@ SumAbsValues[nn, Length[PIlist]]];
@@ -58,9 +225,9 @@ temp = Select[temp, Not[MemberQ[res,Expand[#]]]&];
 temp = Join[temp, -1*temp];
 (*functions = Map[Function[Evaluate[vars], Evaluate[#]]&, MapThread[Times, {(1-#)& /@ temp, Denominator/@temp}]]*)
 functions = Map[Function[Evaluate[vars], Evaluate[#]]&, Numerator[Factor[1-#]]& /@ temp];
-numeratorPi1 = Flatten[Map[#[primes1]&, functions]];
-numeratorPi2 = Flatten[Map[#[primes2]&, functions]];
-numeratorPi3 = Flatten[Map[#[primes3]&, functions]];
+numeratorPi1 = Map[#[Sequence@@primes1]&, functions];
+numeratorPi2 = Map[#[Sequence@@primes2]&, functions];
+numeratorPi3 = Map[#[Sequence@@primes3]&, functions];
 goodInd1 = FindGoodIndices[numeratorPi1, PIsEvalAtPrimes1];
 goodInd2 = FindGoodIndices[numeratorPi2, PIsEvalAtPrimes2];
 goodInd3 = FindGoodIndices[numeratorPi3, PIsEvalAtPrimes3];
@@ -74,7 +241,7 @@ Return[res]]
 
 DetermineIfGoodTuples[tuples_, PIsEvalAtPrimes_, primes_, vars_] := Block[{res, functions, bool, numeratorPi},
 functions =  Map[Function[Evaluate[vars], Evaluate[#]]&, Map[Numerator[Factor[tuples[[#]][[1]]-tuples[[#]][[2]]]]&, Range[Length[tuples]]]];
-numeratorPi = Flatten[Map[#[primes]&, functions]];
+numeratorPi = Map[#[Sequence@@primes]&, functions];
 If[Length[FindGoodIndices[numeratorPi, PIsEvalAtPrimes]]==Length[numeratorPi], bool = 1, bool = 0];
 Return[bool]]
 
@@ -85,9 +252,9 @@ primes1 = FindPrimes1[PIlist];
 primes2 = FindPrimes2[PIlist];
 primes3 = FindPrimes3[PIlist];
 vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
-PIsEvalAtPrimes1 = Flatten[Map[#[primes1]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
-PIsEvalAtPrimes2 = Flatten[Map[#[primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
-PIsEvalAtPrimes3 = Flatten[Map[#[primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]]];
+PIsEvalAtPrimes1 = Map[#[Sequence@@primes1]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes2 = Map[#[Sequence@@primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes3 = Map[#[Sequence@@primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
 subs = Subsets[rs1,{k}];
 res = Map[Subsets[#,{2}]&,subs,{1}];
 bools1 = DetermineIfGoodTuples[#,PIsEvalAtPrimes1, primes1, vars]& /@ res;
@@ -99,7 +266,15 @@ res = DeleteDuplicates[Flatten[Permutations/@ Flatten[S3IdOrbit /@ res, 1], 1]];
 Return[res]]
 
 
-End[];
+GenerateRSnRefined[rs1_, k_, PIlist_]:=Block[{res, tuples, len},
+res = GenerateRSn[rs1, k, PIlist];
+len = Length[res[[1]]];
+tuples = Tuples[{1,-1}, len];
+res = DeleteDuplicates[Simplify/@Flatten[Map[Function[x,MapThread[If[#2==1,#1,1/#1]&,{x,#}]&/@tuples],res],1]];
+Return[res]]
 
 
-EndPackage[];
+(*End[];*)
+
+
+(*EndPackage[];*)
