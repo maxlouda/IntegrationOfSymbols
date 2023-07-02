@@ -1,26 +1,5 @@
 (* ::Package:: *)
 
-(*If necessary, add the address to the file where the packages are saved to the $Path variable.*)
-
-
-(*BeginPackage["ArgumentSearch`", {"Factorizations`", "GenerateEqualSumArrays`"}];*)
-
-
-(*GenerateRS1::usage = "In: user defined cut-off integer n, list of multiplicatively independent polynomials. Out: candidates for depth one arguments in list RS1.";
-IfDivisibleThenDivide::usage = "In: integer num, listPIsEvalAtPrimes. Out: -1, 1, or zero";
-FindGoodIndices::usage = "In: list tobechecked, list PIsEvalAtPrimes. Out: all good indices of tobechecked.";
-DetermineIfGoodTuples::usage = "In: list of tuples, PIsEvalAtPrimes, primes, vars. Out: boolean.";
-GenerateRSn::usage = "In: list rs1, integer k. Out: all admissible k-tuples of arguments.";
-*)
-
-
-(*Begin["`Private`"];*)
-
-
-(*Unprotect["`*"];
-Clear["`*"];*)
-
-
 AllSigns[len_] := AllSigns[len]=
     Block[{res},
         res = Table[PadLeft[ConstantArray[1, i], len - 1, 0], {i, 0, 
@@ -272,9 +251,3 @@ len = Length[res[[1]]];
 tuples = Tuples[{1,-1}, len];
 res = DeleteDuplicates[Simplify/@Flatten[Map[Function[x,MapThread[If[#2==1,#1,1/#1]&,{x,#}]&/@tuples],res],1]];
 Return[res]]
-
-
-(*End[];*)
-
-
-(*EndPackage[];*)
