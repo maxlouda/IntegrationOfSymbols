@@ -12,3 +12,4 @@ The above packages can be integrated into PolyLogTools as follows:
 2. Open PolyLogTools.m and add
    ```Get["ArgumentSearch`"]; Get["Symbols2`"];```
    to the cell handling subdirectory structure and subroutines.
+3. You might also want to use the updated Usage.m file.
