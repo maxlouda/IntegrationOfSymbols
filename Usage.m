@@ -350,4 +350,4 @@ GenerateRS1::usage = "GenerateRS1[n, {poly1, ..., polyn}] In: user defined cut-o
 FindGoodIndices::usage = "FindGoodIndices[lst1, lst2] In: list tobechecked, list PIsEvalAtPrimes. Out: all good indices of tobechecked.";
 DetermineIfGoodTuples::usage = "DetermineIfGoodTuples[{tpl1, ..., tpln}] In: list of tuples, PIsEvalAtPrimes, primes, vars. Out: boolean.";*)
 GenerateRSn::usage = "GenerateRSn[ArgsDepth1, depth, PIlist] In: list ArgsDepth1, integer depth, list PIlist. Out: all probably admissible k-tuples of arguments for Li function types.";
-GenerateRSn2::usage = "GenerateRSn2[ArgsDepth1, depth, PIlist] In: list ArgsDepth1, integer depth, list PIlist. Out: all probably admissible k-tuples of arguments for G function types."
+GenerateRSn2::usage = "GenerateRSn2[ArgsDepth1, depth, PIlist] In: list ArgsDepth1, integer depth, list PIlist. Out: all probably admissible k-tuples of arguments for G function types.";
