@@ -225,7 +225,11 @@ If[Length[FindGoodIndices[numeratorPi, PIsEvalAtPrimes]]==Length[numeratorPi], b
 Return[bool]]
 
 
-GenerateRSn[rs1_, k_, PIlist_]:= Block[{vars, res, bools, subs, bools1, bools2, bools3, len, primes1, primes2, primes3, PIsEvalAtPrimes1, PIsEvalAtPrimes2, PIsEvalAtPrimes3},
+(* GenerateRSn2: For G functions as described on pages 22f in Duhr's, Gangl's and Rhodes' paper.
+GenerateRSn: For Li functions. *)
+
+
+GenerateRSn2[rs1_, k_, PIlist_]:= Block[{vars, res, bools, subs, bools1, bools2, bools3, len, primes1, primes2, primes3, PIsEvalAtPrimes1, PIsEvalAtPrimes2, PIsEvalAtPrimes3},
 len = Length[PIlist];
 primes1 = FindPrimes1[PIlist];
 primes2 = FindPrimes2[PIlist];
@@ -245,9 +249,42 @@ res = DeleteDuplicates[Flatten[Permutations/@ Flatten[S3IdOrbit /@ res, 1], 1]];
 Return[res]]
 
 
-GenerateRSnRefined[rs1_, k_, PIlist_]:=Block[{res, tuples, len},
+(*GenerateRSnRefined[rs1_, k_, PIlist_]:=Block[{res, tuples, len},
 res = GenerateRSn[rs1, k, PIlist];
 len = Length[res[[1]]];
 tuples = Tuples[{1,-1}, len];
 res = DeleteDuplicates[Simplify/@Flatten[Map[Function[x,MapThread[If[#2==1,#1,1/#1]&,{x,#}]&/@tuples],res],1]];
+Return[res]]*)
+
+
+DetermineIfGoodList[list_, k_]:=Module[{res},
+If[Length[list]==k,res=1,res=0];
+Return[res]]
+
+
+GenerateRSn[rs1_,k_,PIlist_]:=Block[{vars, res, bools, subs, bools1, bools2, bools3, len, primes1, primes2, primes3, PIsEvalAtPrimes1, PIsEvalAtPrimes2, PIsEvalAtPrimes3, functions, numeratorPi1, numeratorPi2, numeratorPi3, goodInd1, goodInd2, goodInd3},
+len = Length[PIlist];
+primes1 = FindPrimes1[PIlist];
+primes2 = FindPrimes2[PIlist];
+primes3 = FindPrimes3[PIlist];
+vars = Union @@ (Variables[Apply[List, #]]& /@ PIlist);
+PIsEvalAtPrimes1 = Map[#[Sequence@@primes1]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes2 = Map[#[Sequence@@primes2]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+PIsEvalAtPrimes3 = Map[#[Sequence@@primes3]&, Map[Function[Evaluate[vars], Evaluate[#]]&, PIlist]];
+subs = Subsets[Factor[rs1],{k}];
+res = Map[Flatten[Table[Subsequences[#,{i}],{i,2,k}],1]&,subs,{1}];
+res = Apply[Times,res,{2}];
+functions = Map[Function[Evaluate[vars], Evaluate[#]]&, Numerator[Factor[1-#]]& /@ res,{2}];
+numeratorPi1 = Map[#[Sequence@@primes1]&, functions, {2}];
+numeratorPi2 = Map[#[Sequence@@primes2]&, functions, {2}];
+numeratorPi3 = Map[#[Sequence@@primes3]&, functions, {2}];
+goodInd1 = FindGoodIndices[#, PIsEvalAtPrimes1]&/@numeratorPi1;
+goodInd2 = FindGoodIndices[#, PIsEvalAtPrimes2]&/@numeratorPi2;
+goodInd3 = FindGoodIndices[#, PIsEvalAtPrimes3]&/@numeratorPi3;
+bools1 = DetermineIfGoodList[#,k*(k-1)/2]&/@goodInd1;
+bools2 = DetermineIfGoodList[#,k*(k-1)/2]&/@goodInd2;
+bools3 = DetermineIfGoodList[#,k*(k-1)/2]&/@goodInd3;
+bools = bools1 * bools2 * bools3;
+res = Pick[subs, bools, 1];
+res = DeleteDuplicates[Flatten[Permutations/@ res, 1]];
 Return[res]]
